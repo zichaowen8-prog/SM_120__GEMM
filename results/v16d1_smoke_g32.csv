@@ -1,0 +1,8 @@
+version,description,M,N,K,group_size,BM,BN,BK,warp_tile_m,warp_tile_n,stages,threads,registers_per_thread,smem_bytes,occupancy,cache_mode,median_ms,mean_ms,min_ms,p95_ms,effective_tflops,speedup_vs_previous,speedup_vs_baseline,max_abs_error,rmse,notes
+quantize,"GPU symmetric group quantization",4096,4096,4096,32,0,0,0,0,0,0,256,-1,0,-1,preprocess,1.114368,1.1027521,0.95478398,1.284768,0,0,0,0,0,""
+repack,"CTA tile-contiguous BN128 BK32",4096,4096,4096,32,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.055744,0.056760542,0.054591998,0.068512,0,0,0,0,0,""
+repack_mma,"lane-native mma.m16n8k16 INT4 fragments",4096,4096,4096,32,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.037312001,0.037344005,0.036031999,0.038176,0,0,0,0,0,""
+dequant,"materialize packed INT4 B as FP16",4096,4096,4096,32,0,0,0,0,0,0,256,-1,0,-1,baseline-component,0.138752,0.14157759,0.137504,0.17046399,0,0,0,0,0,"separately timed component of dequant + cuBLAS"
+cublas_fp16,"cuBLAS FP16 Tensor Core on dequantized B",4096,4096,4096,32,0,0,0,0,0,0,0,-1,0,-1,steady,2.0248959,2.0267615,2.0160961,2.0409601,67.874577,0,0,0,0,"not workload-equivalent: B already materialized"
+separate,"dequant kernel + cuBLAS",4096,4096,4096,32,0,0,0,0,0,0,0,-1,0,-1,steady,2.5096641,2.5008214,2.219424,2.6679361,54.763885,0,0,0,0,"includes dequant and GEMM"
+v16d1,"register MMA warp tile 16x64",4096,4096,4096,32,64,128,32,16,64,2,256,70,14848,0.5,steady,2.7746241,2.8036618,2.4906559,3.2097919,49.534261,1,1,0,0,""

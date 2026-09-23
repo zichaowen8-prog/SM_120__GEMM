@@ -1,0 +1,9 @@
+version,description,M,N,K,group_size,BM,BN,BK,warp_tile_m,warp_tile_n,stages,threads,registers_per_thread,smem_bytes,occupancy,cache_mode,median_ms,mean_ms,min_ms,p95_ms,effective_tflops,speedup_vs_previous,speedup_vs_baseline,max_abs_error,rmse,notes
+quantize,"GPU symmetric group quantization",4096,4096,4096,32,0,0,0,0,0,0,256,-1,0,-1,preprocess,1.0585279,1.0788001,0.95520002,1.27952,0,0,0,0,0,""
+repack,"CTA tile-contiguous BN128 BK32",4096,4096,4096,32,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.055872001,0.057078399,0.054432001,0.065343998,0,0,0,0,0,""
+dequant,"materialize packed INT4 B as FP16",4096,4096,4096,32,0,0,0,0,0,0,256,-1,0,-1,baseline-component,0.13891201,0.138992,0.13772801,0.14128,0,0,0,0,0,"separately timed component of dequant + cuBLAS"
+cublas_fp16,"cuBLAS FP16 Tensor Core on dequantized B",4096,4096,4096,32,0,0,0,0,0,0,0,-1,0,-1,steady,2.0248959,2.0228672,2.009568,2.0297279,67.874577,0,0,0,0,"not workload-equivalent: B already materialized"
+separate,"dequant kernel + cuBLAS",4096,4096,4096,32,0,0,0,0,0,0,0,-1,0,-1,steady,2.46176,2.4751949,2.2083199,2.7004161,55.829549,0,0,0,0,"includes dequant and GEMM"
+v16a,"warp-streamed 16x16 FP32 scratch epilogue",4096,4096,4096,32,64,128,32,32,64,2,128,96,24064,0.33333334,steady,2.6352639,2.6369743,2.400672,2.788096,52.153772,1,1,0,0,""
+final,"selected stage2 kernel, A stride 40 / B stride 152",4096,4096,4096,32,64,128,32,32,64,2,128,94,32768,0.25,steady,2.8760641,2.8853858,2.6517761,3.0985279,47.787167,0.91627442,0.91627442,0,0,""
+final_cold,"selected stage2 kernel, A stride 40 / B stride 152",4096,4096,4096,32,64,128,32,32,64,2,128,94,32768,0.25,cold-ish,2.9675839,2.9634542,2.8385279,3.1847041,46.313418,0.96916014,0.88801665,0,0,"128 MiB cache-disturb kernel before each untimed GEMM event"
