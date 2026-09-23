@@ -39,7 +39,7 @@ MMA fragment；在线 mainloop 中才做 INT4 unpack、乘 group scale，并立�
 ## 构建与运行
 
 ```bash
-make -j CUDA_HOME=/usr/local/cuda
+make -j 
 
 ./build/int4_gemm --correctness --size 256 --group 32
 ./build/int4_gemm --correctness --size 256 --group 64

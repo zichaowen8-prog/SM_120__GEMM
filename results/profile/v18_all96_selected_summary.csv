@@ -1,0 +1,3 @@
+report,duration_ms,tensor_active_pct,sm_throughput_pct,dram_throughput_pct,l1tex_throughput_pct,l2_hit_pct,active_warps_per_sm,eligible_warps_per_scheduler,issued_warps_per_scheduler,long_scoreboard,short_scoreboard,barrier,mio_throttle,math_pipe,not_selected,registers_per_thread,dynamic_smem_kbytes,achieved_occupancy_pct,local_spilling_requests
+results/profile/v18a_all96_g32.ncu-rep,2.606368,46.316907,46.316907,6.561198,51.713238,95.845274,19.142860,0.361276,0.23,0.066826,1.219958,3.384927,0.149129,11.483828,0.578094,96,12.816000,39.880958,0
+results/profile/v18b_all96_g128.ncu-rep,2.604032,46.371477,46.371477,5.144193,51.728776,96.768957,19.115054,0.431618,0.26,0.501494,0.769837,0.003455,0.024133,11.393738,0.667362,96,12.832000,39.823029,0
