@@ -1,0 +1,10 @@
+version,description,M,N,K,group_size,BM,BN,BK,warp_tile_m,warp_tile_n,stages,threads,registers_per_thread,smem_bytes,occupancy,cache_mode,median_ms,mean_ms,min_ms,p95_ms,effective_tflops,speedup_vs_previous,speedup_vs_baseline,max_abs_error,rmse,notes
+quantize,"GPU symmetric group quantization",4096,4096,4096,128,0,0,0,0,0,0,256,-1,0,-1,preprocess,0.41455999,0.4200111,0.41081601,0.43932801,0,0,0,0,0,""
+repack,"CTA tile-contiguous BN128 BK32",4096,4096,4096,128,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.052928001,0.053331658,0.052352,0.054528002,0,0,0,0,0,""
+repack_mma,"lane-native MMA fragments + tile-contiguous scales",4096,4096,4096,128,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.038527999,0.042442206,0.037567999,0.041760001,0,0,0,0,0,"weights and scales; no allocation in timed region"
+repack_mma_pair,"two k16 fragments per uint32 + tile-contiguous scales",4096,4096,4096,128,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.030463999,0.031348165,0.029983999,0.032512002,0,0,0,0,0,"weights and scales; no allocation in timed region"
+end_to_end,"quantize + final-layout repack + fused final GEMM",4096,4096,4096,128,64,128,32,64,32,2,128,-1,0,-1,one-shot,3.0667839,3.0638785,2.6490879,3.4561279,44.815337,0,0,0,0,"preprocessing is normally amortized for inference weights"
+dequant,"materialize packed INT4 B as FP16",4096,4096,4096,128,0,0,0,0,0,0,256,-1,0,-1,baseline-component,0.13196801,0.13882291,0.13135999,0.182496,0,0,0,0,0,"separately timed component of dequant + cuBLAS"
+cublas_fp16,"cuBLAS FP16 Tensor Core on dequantized B",4096,4096,4096,128,0,0,0,0,0,0,0,-1,0,-1,steady,2.053504,2.0507188,2.023104,2.067872,66.928993,0,0,0,0,"not workload-equivalent: B already materialized"
+separate,"dequant kernel + cuBLAS",4096,4096,4096,128,0,0,0,0,0,0,0,-1,0,-1,steady,2.6545279,2.6800933,2.22896,2.952256,51.775291,0,0,0,0,"includes dequant and GEMM"
+v18a,"fragment-pair TMA + two packed scale registers",4096,4096,4096,128,64,128,32,64,32,2,128,100,12816,0.33333334,steady,2.5815361,2.5995386,2.158752,2.9208961,53.239215,1,1,0,0,""

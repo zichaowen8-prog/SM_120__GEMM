@@ -1,0 +1,11 @@
+version,description,M,N,K,group_size,BM,BN,BK,warp_tile_m,warp_tile_n,stages,threads,registers_per_thread,smem_bytes,occupancy,cache_mode,median_ms,mean_ms,min_ms,p95_ms,effective_tflops,speedup_vs_previous,speedup_vs_baseline,max_abs_error,rmse,notes
+quantize,"GPU symmetric group quantization",4096,4096,4096,64,0,0,0,0,0,0,256,-1,0,-1,preprocess,0.572128,0.60432261,0.56950402,0.72281599,0,0,0,0,0,""
+repack,"CTA tile-contiguous BN128 BK32",4096,4096,4096,64,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.053984001,0.054499377,0.053440001,0.055712,0,0,0,0,0,""
+repack_mma,"lane-native MMA fragments + tile-contiguous scales",4096,4096,4096,64,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.039551999,0.040088978,0.038463999,0.041503999,0,0,0,0,0,"weights and scales; no allocation in timed region"
+repack_mma_pair,"two k16 fragments per uint32 + tile-contiguous scales",4096,4096,4096,64,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.031424001,0.031816963,0.030784,0.032864001,0,0,0,0,0,"weights and scales; no allocation in timed region"
+end_to_end,"quantize + final-layout repack + fused final GEMM",4096,4096,4096,64,64,128,32,64,32,2,128,-1,0,-1,one-shot,3.15008,3.1705844,2.8920641,3.4076481,43.630306,0,0,0,0,"preprocessing is normally amortized for inference weights"
+dequant,"materialize packed INT4 B as FP16",4096,4096,4096,64,0,0,0,0,0,0,256,-1,0,-1,baseline-component,0.13664,0.13999438,0.13488001,0.174656,0,0,0,0,0,"separately timed component of dequant + cuBLAS"
+cublas_fp16,"cuBLAS FP16 Tensor Core on dequantized B",4096,4096,4096,64,0,0,0,0,0,0,0,-1,0,-1,steady,2.0572159,2.05619,2.0210559,2.0736639,66.808229,0,0,0,0,"not workload-equivalent: B already materialized"
+separate,"dequant kernel + cuBLAS",4096,4096,4096,64,0,0,0,0,0,0,0,-1,0,-1,steady,2.4795201,2.4760733,2.233824,2.705344,55.429659,0,0,0,0,"includes dequant and GEMM"
+final,"group-aware V18/V17: compact pair g32, ldmatrix g64, pair g128",4096,4096,4096,64,64,128,32,64,32,2,128,96,12816,0.41666666,steady,2.3820159,2.3881917,2.1557119,2.6260159,57.698587,1,1,0,0,""
+final_cold,"group-aware V18/V17: compact pair g32, ldmatrix g64, pair g128",4096,4096,4096,64,64,128,32,64,32,2,128,96,12816,0.41666666,cold-ish,2.4033599,2.4082034,2.13504,2.656256,57.186173,0.99111915,0.99111912,0,0,"128 MiB cache-disturb kernel before each untimed GEMM event"

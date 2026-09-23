@@ -1,0 +1,7 @@
+version,description,M,N,K,group_size,BM,BN,BK,warp_tile_m,warp_tile_n,stages,threads,registers_per_thread,smem_bytes,occupancy,cache_mode,median_ms,mean_ms,min_ms,p95_ms,effective_tflops,speedup_vs_previous,speedup_vs_baseline,max_abs_error,rmse,notes
+quantize,"GPU symmetric group quantization",4096,4096,4096,128,0,0,0,0,0,0,256,-1,0,-1,preprocess,0.41295999,0.41605744,0.41068801,0.43536001,0,0,0,0,0,""
+repack,"CTA tile-contiguous BN128 BK32",4096,4096,4096,128,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.053856,0.055535015,0.052384,0.056832001,0,0,0,0,0,""
+dequant,"materialize packed INT4 B as FP16",4096,4096,4096,128,0,0,0,0,0,0,256,-1,0,-1,baseline-component,0.132736,0.13589221,0.131328,0.16630401,0,0,0,0,0,"separately timed component of dequant + cuBLAS"
+cublas_fp16,"cuBLAS FP16 Tensor Core on dequantized B",4096,4096,4096,128,0,0,0,0,0,0,0,-1,0,-1,steady,2.0381441,2.0431423,2.022368,2.061312,67.433383,0,0,0,0,"not workload-equivalent: B already materialized"
+separate,"dequant kernel + cuBLAS",4096,4096,4096,128,0,0,0,0,0,0,0,-1,0,-1,steady,2.483968,2.4787996,2.2050879,2.7083521,55.330404,0,0,0,0,"includes dequant and GEMM"
+v15b,"TMA A/B with compact A shared tile",4096,4096,4096,128,64,128,32,32,64,2,128,122,32784,0.25,steady,3.2576959,3.2628829,2.9835839,3.4767039,42.189006,1,1,0,0,""

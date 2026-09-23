@@ -1,0 +1,10 @@
+version,description,M,N,K,group_size,BM,BN,BK,warp_tile_m,warp_tile_n,stages,threads,registers_per_thread,smem_bytes,occupancy,cache_mode,median_ms,mean_ms,min_ms,p95_ms,effective_tflops,speedup_vs_previous,speedup_vs_baseline,max_abs_error,rmse,notes
+quantize,"GPU symmetric group quantization",4096,4096,4096,128,0,0,0,0,0,0,256,-1,0,-1,preprocess,0.41340801,0.41981846,0.41116801,0.442624,0,0,0,0,0,""
+repack,"CTA tile-contiguous BN128 BK32",4096,4096,4096,128,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.052864,0.053491034,0.052191999,0.055167999,0,0,0,0,0,""
+repack_mma,"lane-native MMA fragments + tile-contiguous scales",4096,4096,4096,128,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.038559999,0.038927663,0.037792001,0.039935999,0,0,0,0,0,"weights and scales; no allocation in timed region"
+repack_mma_pair,"two k16 fragments per uint32 + tile-contiguous scales",4096,4096,4096,128,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.030432001,0.03108049,0.029983999,0.033984002,0,0,0,0,0,"weights and scales; no allocation in timed region"
+end_to_end,"quantize + final-layout repack + fused final GEMM",4096,4096,4096,128,64,128,32,64,32,2,128,-1,0,-1,one-shot,3.00736,3.0478764,2.646944,3.4118719,45.700865,0,0,0,0,"preprocessing is normally amortized for inference weights"
+dequant,"materialize packed INT4 B as FP16",4096,4096,4096,128,0,0,0,0,0,0,256,-1,0,-1,baseline-component,0.132864,0.13843688,0.13142399,0.183264,0,0,0,0,0,"separately timed component of dequant + cuBLAS"
+cublas_fp16,"cuBLAS FP16 Tensor Core on dequantized B",4096,4096,4096,128,0,0,0,0,0,0,0,-1,0,-1,steady,2.0573759,2.052835,2.0214081,2.0718081,66.803034,0,0,0,0,"not workload-equivalent: B already materialized"
+separate,"dequant kernel + cuBLAS",4096,4096,4096,128,0,0,0,0,0,0,0,-1,0,-1,steady,2.6368959,2.6432984,2.2087359,2.950464,52.121494,0,0,0,0,"includes dequant and GEMM"
+v18a,"fragment-pair TMA + two packed scale registers",4096,4096,4096,128,64,128,32,64,32,2,128,100,12816,0.33333334,steady,2.637152,2.6302536,2.1816001,2.96176,52.116433,1,1,0,0,""

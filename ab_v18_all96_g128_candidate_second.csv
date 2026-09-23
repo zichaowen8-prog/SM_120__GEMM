@@ -1,0 +1,10 @@
+version,description,M,N,K,group_size,BM,BN,BK,warp_tile_m,warp_tile_n,stages,threads,registers_per_thread,smem_bytes,occupancy,cache_mode,median_ms,mean_ms,min_ms,p95_ms,effective_tflops,speedup_vs_previous,speedup_vs_baseline,max_abs_error,rmse,notes
+quantize,"GPU symmetric group quantization",4096,4096,4096,128,0,0,0,0,0,0,256,-1,0,-1,preprocess,0.41254401,0.41671804,0.41011199,0.43545601,0,0,0,0,0,""
+repack,"CTA tile-contiguous BN128 BK32",4096,4096,4096,128,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.053888001,0.054055523,0.052416001,0.055232,0,0,0,0,0,""
+repack_mma,"lane-native MMA fragments + tile-contiguous scales",4096,4096,4096,128,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.039423998,0.039517913,0.037503999,0.040383998,0,0,0,0,0,"weights and scales; no allocation in timed region"
+repack_mma_pair,"two k16 fragments per uint32 + tile-contiguous scales",4096,4096,4096,128,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.031392001,0.031513117,0.030112,0.032639999,0,0,0,0,0,"weights and scales; no allocation in timed region"
+end_to_end,"quantize + final-layout repack + fused final GEMM",4096,4096,4096,128,64,128,32,64,32,2,128,-1,0,-1,one-shot,2.9005761,2.9062769,2.6464961,3.1525121,47.383329,0,0,0,0,"preprocessing is normally amortized for inference weights"
+dequant,"materialize packed INT4 B as FP16",4096,4096,4096,128,0,0,0,0,0,0,256,-1,0,-1,baseline-component,0.13276801,0.13647917,0.131328,0.177056,0,0,0,0,0,"separately timed component of dequant + cuBLAS"
+cublas_fp16,"cuBLAS FP16 Tensor Core on dequantized B",4096,4096,4096,128,0,0,0,0,0,0,0,-1,0,-1,steady,2.0573759,2.0568645,2.020256,2.0736639,66.803034,0,0,0,0,"not workload-equivalent: B already materialized"
+separate,"dequant kernel + cuBLAS",4096,4096,4096,128,0,0,0,0,0,0,0,-1,0,-1,steady,2.4896319,2.4767816,2.209152,2.708128,55.204528,0,0,0,0,"includes dequant and GEMM"
+v18b,"compact pair/scale + computed-phase full/empty TMA",4096,4096,4096,128,64,128,32,64,32,2,128,96,12832,0.41666666,steady,2.3547201,2.3708413,2.143136,2.600992,58.367427,1,1,0,0,""

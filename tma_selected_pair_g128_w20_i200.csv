@@ -1,0 +1,9 @@
+version,description,M,N,K,group_size,BM,BN,BK,warp_tile_m,warp_tile_n,stages,threads,registers_per_thread,smem_bytes,occupancy,cache_mode,median_ms,mean_ms,min_ms,p95_ms,effective_tflops,speedup_vs_previous,speedup_vs_baseline,max_abs_error,rmse,notes
+quantize,"GPU symmetric group quantization",4096,4096,4096,128,0,0,0,0,0,0,256,-1,0,-1,preprocess,0.41231999,0.41543758,0.40995201,0.43472001,0,0,0,0,0,""
+repack,"CTA tile-contiguous BN128 BK32",4096,4096,4096,128,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.053856,0.054009296,0.051968001,0.055872001,0,0,0,0,0,""
+dequant,"materialize packed INT4 B as FP16",4096,4096,4096,128,0,0,0,0,0,0,256,-1,0,-1,baseline-component,0.13248,0.13652174,0.130816,0.16860799,0,0,0,0,0,"separately timed component of dequant + cuBLAS"
+cublas_fp16,"cuBLAS FP16 Tensor Core on dequantized B",4096,4096,4096,128,0,0,0,0,0,0,0,-1,0,-1,steady,2.0490241,2.0455277,2.0198081,2.0666561,67.075323,0,0,0,0,"not workload-equivalent: B already materialized"
+separate,"dequant kernel + cuBLAS",4096,4096,4096,128,0,0,0,0,0,0,0,-1,0,-1,steady,2.4598081,2.4593508,2.2030079,2.6751039,55.873852,0,0,0,0,"includes dequant and GEMM"
+v11d,"padding sweep A+8 B+24",4096,4096,4096,128,64,128,32,32,64,2,128,96,32768,0.25,steady,3.2450881,3.2578096,3.003968,3.4747519,42.352919,1,1,0,0,""
+final,"group-adaptive: cp.async g32/g64, TMA A/B g128",4096,4096,4096,128,64,128,32,32,64,2,128,122,32784,0.25,steady,3.245472,3.2547338,2.97104,3.4553599,42.34791,0.99988173,0.99988173,0,0,""
+final_cold,"group-adaptive: cp.async g32/g64, TMA A/B g128",4096,4096,4096,128,64,128,32,32,64,2,128,122,32784,0.25,cold-ish,3.2808959,3.2914777,2.9870081,3.4993601,41.890677,0.98920298,0.98908595,0,0,"128 MiB cache-disturb kernel before each untimed GEMM event"

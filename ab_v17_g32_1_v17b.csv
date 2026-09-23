@@ -1,0 +1,10 @@
+version,description,M,N,K,group_size,BM,BN,BK,warp_tile_m,warp_tile_n,stages,threads,registers_per_thread,smem_bytes,occupancy,cache_mode,median_ms,mean_ms,min_ms,p95_ms,effective_tflops,speedup_vs_previous,speedup_vs_baseline,max_abs_error,rmse,notes
+quantize,"GPU symmetric group quantization",4096,4096,4096,32,0,0,0,0,0,0,256,-1,0,-1,preprocess,1.082304,1.0892491,0.95407999,1.285696,0,0,0,0,0,""
+repack,"CTA tile-contiguous BN128 BK32",4096,4096,4096,32,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.055936001,0.056055345,0.054464001,0.057055999,0,0,0,0,0,""
+repack_mma,"lane-native MMA fragments + tile-contiguous scales",4096,4096,4096,32,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.041471999,0.041733302,0.039808001,0.047680002,0,0,0,0,0,"weights and scales; no allocation in timed region"
+repack_mma_pair,"two k16 fragments per uint32 + tile-contiguous scales",4096,4096,4096,32,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.033472002,0.03414287,0.032288,0.039744001,0,0,0,0,0,"weights and scales; no allocation in timed region"
+end_to_end,"quantize + final-layout repack + fused final GEMM",4096,4096,4096,32,64,128,32,32,64,2,128,-1,0,-1,one-shot,3.8214719,3.8596399,3.512032,4.2849598,35.964926,0,0,0,0,"preprocessing is normally amortized for inference weights"
+dequant,"materialize packed INT4 B as FP16",4096,4096,4096,32,0,0,0,0,0,0,256,-1,0,-1,baseline-component,0.13891201,0.14329574,0.13776,0.18291201,0,0,0,0,0,"separately timed component of dequant + cuBLAS"
+cublas_fp16,"cuBLAS FP16 Tensor Core on dequantized B",4096,4096,4096,32,0,0,0,0,0,0,0,-1,0,-1,steady,2.056864,2.0542948,2.0213759,2.073504,66.819659,0,0,0,0,"not workload-equivalent: B already materialized"
+separate,"dequant kernel + cuBLAS",4096,4096,4096,32,0,0,0,0,0,0,0,-1,0,-1,steady,2.4737599,2.5059991,2.221024,2.84304,55.558728,0,0,0,0,"includes dequant and GEMM"
+v17b,"64x32 TMA + ldmatrix.x4 A fragments",4096,4096,4096,32,64,128,32,64,32,2,128,96,12816,0.41666666,steady,2.4168,2.4403188,2.132576,2.995584,56.868153,1,1,0,0,""

@@ -1,0 +1,12 @@
+version,description,M,N,K,group_size,BM,BN,BK,warp_tile_m,warp_tile_n,stages,threads,registers_per_thread,smem_bytes,occupancy,cache_mode,median_ms,mean_ms,min_ms,p95_ms,effective_tflops,speedup_vs_previous,speedup_vs_baseline,max_abs_error,rmse,notes
+quantize,"GPU symmetric group quantization",4096,4096,4096,32,0,0,0,0,0,0,256,-1,0,-1,preprocess,0.955616,1.0349009,0.95072001,1.28304,0,0,0,0,0,""
+repack,"CTA tile-contiguous BN128 BK32",4096,4096,4096,32,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.055872001,0.056086402,0.054591998,0.056480002,0,0,0,0,0,""
+dequant,"materialize packed INT4 B as FP16",4096,4096,4096,32,0,0,0,0,0,0,256,-1,0,-1,baseline-component,0.139424,0.15281919,0.137536,0.19574399,0,0,0,0,0,"separately timed component of dequant + cuBLAS"
+cublas_fp16,"cuBLAS FP16 Tensor Core on dequantized B",4096,4096,4096,32,0,0,0,0,0,0,0,-1,0,-1,steady,2.02336,2.0238318,2.0149119,2.0384641,67.926099,0,0,0,0,"not workload-equivalent: B already materialized"
+separate,"dequant kernel + cuBLAS",4096,4096,4096,32,0,0,0,0,0,0,0,-1,0,-1,steady,2.473376,2.4510465,2.2076161,2.6083519,55.567351,0,0,0,0,"includes dequant and GEMM"
+v15a,"TMA packed-B + cp.async padded-A",4096,4096,4096,32,64,128,32,32,64,2,128,96,32784,0.25,steady,3.17856,3.1934907,2.9502399,3.3854079,43.239377,1,1,0,0,""
+v15b,"TMA A/B with compact A shared tile",4096,4096,4096,32,64,128,32,32,64,2,128,122,32784,0.25,steady,2.9714561,2.9913328,2.721216,3.2142079,46.253066,1.0696978,1.0696978,0,0,""
+v15c,"three-stage TMA A/B pipeline",4096,4096,4096,32,64,128,32,32,64,3,128,120,32792,0.25,steady,2.942656,2.9594529,2.7309761,3.1667521,46.705749,1.0097871,1.080167,0,0,""
+v15d,"four-stage TMA A/B pipeline, compact B",4096,4096,4096,32,64,128,32,32,64,4,128,100,32800,0.25,steady,4.0795841,4.0664706,3.799392,4.233984,33.689452,0.72131275,0.77913825,0,0,""
+final,"selected stage2 kernel, A stride 40 / B stride 152",4096,4096,4096,32,64,128,32,32,64,2,128,94,32768,0.25,steady,2.8848,2.8671052,2.6476481,3.0156479,47.642455,1.4141653,1.1018303,0,0,""
+final_cold,"selected stage2 kernel, A stride 40 / B stride 152",4096,4096,4096,32,64,128,32,32,64,2,128,94,32768,0.25,cold-ish,2.968832,2.9548624,2.686976,3.185632,46.293947,0.97169524,1.0706433,0,0,"128 MiB cache-disturb kernel before each untimed GEMM event"

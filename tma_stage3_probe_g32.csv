@@ -1,0 +1,11 @@
+version,description,M,N,K,group_size,BM,BN,BK,warp_tile_m,warp_tile_n,stages,threads,registers_per_thread,smem_bytes,occupancy,cache_mode,median_ms,mean_ms,min_ms,p95_ms,effective_tflops,speedup_vs_previous,speedup_vs_baseline,max_abs_error,rmse,notes
+quantize,"GPU symmetric group quantization",4096,4096,4096,32,0,0,0,0,0,0,256,-1,0,-1,preprocess,1.113152,1.0988896,0.95094401,1.2781121,0,0,0,0,0,""
+repack,"CTA tile-contiguous BN128 BK32",4096,4096,4096,32,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.055840001,0.055934407,0.054432001,0.056736,0,0,0,0,0,""
+dequant,"materialize packed INT4 B as FP16",4096,4096,4096,32,0,0,0,0,0,0,256,-1,0,-1,baseline-component,0.138592,0.1403472,0.136896,0.139616,0,0,0,0,0,"separately timed component of dequant + cuBLAS"
+cublas_fp16,"cuBLAS FP16 Tensor Core on dequantized B",4096,4096,4096,32,0,0,0,0,0,0,0,-1,0,-1,steady,2.015552,2.0162368,2.004096,2.022368,68.189236,0,0,0,0,"not workload-equivalent: B already materialized"
+separate,"dequant kernel + cuBLAS",4096,4096,4096,32,0,0,0,0,0,0,0,-1,0,-1,steady,2.4712639,2.4337599,2.2091839,2.51056,55.614843,0,0,0,0,"includes dequant and GEMM"
+v15a,"TMA packed-B + cp.async padded-A",4096,4096,4096,32,64,128,32,32,64,2,128,96,32784,0.25,steady,3.1554561,3.1442688,2.9200001,3.242816,43.555971,1,1,0,0,""
+v15b,"TMA A/B with compact A shared tile",4096,4096,4096,32,64,128,32,32,64,2,128,122,32784,0.25,steady,3.0196159,2.9398017,2.721216,3.0418241,45.515376,1.0449859,1.0449859,0,0,""
+v15c,"three-stage TMA A/B pipeline",4096,4096,4096,32,64,128,32,32,64,3,128,120,32792,0.25,steady,2.9624,2.9697649,2.7249601,3.139744,46.394462,1.019314,1.0651688,0,0,""
+final,"selected stage2 kernel, A stride 40 / B stride 152",4096,4096,4096,32,64,128,32,32,64,2,128,94,32768,0.25,steady,2.920352,2.9186702,2.65376,3.0840321,47.062462,1.0143983,1.0805054,0,0,""
+final_cold,"selected stage2 kernel, A stride 40 / B stride 152",4096,4096,4096,32,64,128,32,32,64,2,128,94,32768,0.25,cold-ish,2.972672,2.9518864,2.6859519,3.1112959,46.234147,0.98239964,1.0614881,0,0,"128 MiB cache-disturb kernel before each untimed GEMM event"

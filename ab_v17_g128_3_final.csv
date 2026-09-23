@@ -1,0 +1,11 @@
+version,description,M,N,K,group_size,BM,BN,BK,warp_tile_m,warp_tile_n,stages,threads,registers_per_thread,smem_bytes,occupancy,cache_mode,median_ms,mean_ms,min_ms,p95_ms,effective_tflops,speedup_vs_previous,speedup_vs_baseline,max_abs_error,rmse,notes
+quantize,"GPU symmetric group quantization",4096,4096,4096,128,0,0,0,0,0,0,256,-1,0,-1,preprocess,0.41264001,0.41595986,0.410528,0.43574399,0,0,0,0,0,""
+repack,"CTA tile-contiguous BN128 BK32",4096,4096,4096,128,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.053920001,0.054167524,0.05232,0.055232,0,0,0,0,0,""
+repack_mma,"lane-native MMA fragments + tile-contiguous scales",4096,4096,4096,128,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.039487999,0.039378554,0.037376001,0.039967999,0,0,0,0,0,"weights and scales; no allocation in timed region"
+repack_mma_pair,"two k16 fragments per uint32 + tile-contiguous scales",4096,4096,4096,128,0,128,32,0,0,0,256,-1,0,-1,preprocess,0.031456001,0.032196328,0.030048,0.038527999,0,0,0,0,0,"weights and scales; no allocation in timed region"
+end_to_end,"quantize + final-layout repack + fused final GEMM",4096,4096,4096,128,64,128,32,32,64,2,128,-1,0,-1,one-shot,2.972224,2.9817994,2.710912,3.215456,46.241116,0,0,0,0,"preprocessing is normally amortized for inference weights"
+dequant,"materialize packed INT4 B as FP16",4096,4096,4096,128,0,0,0,0,0,0,256,-1,0,-1,baseline-component,0.132672,0.1357405,0.13142399,0.16841599,0,0,0,0,0,"separately timed component of dequant + cuBLAS"
+cublas_fp16,"cuBLAS FP16 Tensor Core on dequantized B",4096,4096,4096,128,0,0,0,0,0,0,0,-1,0,-1,steady,2.057024,2.0551288,2.0206079,2.0756159,66.814463,0,0,0,0,"not workload-equivalent: B already materialized"
+separate,"dequant kernel + cuBLAS",4096,4096,4096,128,0,0,0,0,0,0,0,-1,0,-1,steady,2.4589441,2.4624243,2.2052801,2.689024,55.893485,0,0,0,0,"includes dequant and GEMM"
+final,"group-aware register MMA: TMA g32/g64, cp.async g128",4096,4096,4096,128,64,128,32,32,64,2,128,94,14848,0.41666666,steady,2.5336959,2.5197542,2.262208,2.741888,54.244454,1,1,0,0,""
+final_cold,"group-aware register MMA: TMA g32/g64, cp.async g128",4096,4096,4096,128,64,128,32,32,64,2,128,94,14848,0.41666666,cold-ish,2.5291519,2.5527434,2.262048,2.819072,54.341913,1.0017966,1.0017967,0,0,"128 MiB cache-disturb kernel before each untimed GEMM event"

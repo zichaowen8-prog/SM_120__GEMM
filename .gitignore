@@ -1,0 +1,66 @@
+# ==============================
+# Build directories
+# ==============================
+build/
+build_cuda13/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+
+# ==============================
+# CUDA / C++ generated files
+# ==============================
+*.o
+*.obj
+*.a
+*.so
+*.dll
+*.exe
+*.out
+*.cubin
+*.fatbin
+
+# Generated PTX / SASS
+*.ptx
+*.sass
+
+# ==============================
+# NVIDIA Nsight reports
+# ==============================
+*.ncu-rep
+*.nsys-rep
+*.qdrep
+
+# ==============================
+# Python
+# ==============================
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# ==============================
+# IDE
+# ==============================
+.vscode/
+.idea/
+
+# ==============================
+# OS
+# ==============================
+.DS_Store
+Thumbs.db
+
+# ==============================
+# Internal development notes
+# ==============================
+PROJECT_STATUS.md
+COMPLIANCE_AUDIT.md
+
+# ==============================
+# Temporary
+# ==============================
+*.tmp
+*.log
+*~
