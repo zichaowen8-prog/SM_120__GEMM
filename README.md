@@ -2405,17 +2405,6 @@ group 在编译期化简，把 loader 整数状态移出长活跃区间，并使
 full/empty mbarrier。它从 V17c 的 100 registers、4 blocks/SM 降到 96 registers、
 5 blocks/SM，动态 SMEM 为 12,832 B。交错正反顺序 A/B 比 V17c final 快 4.77%。
 
-### TMA 与 TMEM
-
-TMA 和 TMEM 是两种独立能力。RTX 5070 的 SM120 可执行 TMA；本工程 PTX/SASS
-已实证。SM100 教程中的 `tcgen05.mma` 将 accumulator 写入 TMEM，而 NVIDIA 的
-SM120 GeForce GEMM 路径使用扩展 MMA，不能把 SM100 的可编程 TMEM 路径直接套到
-SM120。这个区别也与 CUTLASS 的
-[SM120 GeForce examples](https://github.com/NVIDIA/cutlass/tree/main/examples/79_blackwell_geforce_gemm)、
-[SM120 TMA collective](https://github.com/NVIDIA/cutlass/blob/main/include/cutlass/gemm/collective/sm120_mma_tma.hpp)
-及 [SM100 TMEM tutorial](https://github.com/NVIDIA/cutlass/blob/main/examples/cute/tutorial/blackwell/01_mma_sm100.cu)
-的架构分支一致。
-
 ## GitHub 实现对照后采用的优化
 
 对照 CUTLASS、DeepGEMM 和 FlashAttention 的开源实现后，优先验证了共同的高性能
